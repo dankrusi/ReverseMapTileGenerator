@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base target="_top">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>ReverseTileGen</title>
+	
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+			background-color: black;
+		}
+		.leaflet-container {
+			height: 100%;
+			width: 100%;
+			background-color: black;
+		}
+	</style>
+
+	
+</head>
+<body>
+
+
+
+<div id="map" style="width: 100%; height: 100%;"></div>
+<script>
+	//const map = L.map('map').setView([51.505, -0.09], 10);
+
+	var img = [13000, 13000];
+	const map = L.map('map').setView([51.505, -0.09], 10);
+	//var rc = new L.RasterCoords(map, img);
+
+	// https://leafletjs.com/reference.html#tilelayer
+	var layerOpts = {
+		tileSize: 768,
+		maxZoom: 10,
+		minZoom: 4,
+		noWrap: true
+		//attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	};
+	const tiles = L.tileLayer('../Output/{z}/{x}/{y}.png', layerOpts).addTo(map);
+
+
+	L.GridLayer.GridDebug = L.GridLayer.extend({
+	  createTile: function (coords) {
+		const tile = document.createElement('div');
+		tile.style.outline = '1px solid green';
+		tile.style.fontWeight = 'bold';
+		tile.style.fontSize = '14pt';
+		tile.innerHTML = [coords.z, coords.x, coords.y].join('/');
+		return tile;
+	  },
+	});
+	L.gridLayer.gridDebug = function (opts) {
+	  return new L.GridLayer.GridDebug(opts);
+	};
+	//map.addLayer(L.gridLayer.gridDebug(layerOpts));
+
+
+	// https://github.com/Leaflet/Leaflet/blob/0f904a515879fcd08f69b7f51799ee7f18f23fd8/src/layer/tile/GridLayer.js#L748
+
+	var zerozero = tiles._tileCoordsToBounds(L.point(56/2, 56/2));
+	console.log(zerozero);
+	console.log(zerozero.getCenter());
+	map.setView(zerozero.getCenter(), 10);
+
+
+
+	function onMapClick(e) {
+		popup
+			.setLatLng(e.latlng)
+			.setContent(`You clicked the map at ${e.latlng.toString()}`)
+			.openOn(map);
+	}
+
+	map.on('click', onMapClick);
+
+</script>
+
+
+
+</body>
+</html>
